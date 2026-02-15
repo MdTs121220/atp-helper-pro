@@ -1,0 +1,99 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+@import "tailwindcss";
+
+body {
+  @apply bg-slate-100 text-slate-800 font-sans antialiased selection:bg-indigo-100 selection:text-indigo-900;
+  font-family: 'Inter', sans-serif;
+  /* Soft Slate Blue Background with subtle gradient */
+  background-color: #f1f5f9;
+  /* Slate-100 */
+  background-image:
+    radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.08) 0px, transparent 50%),
+    /* Indigo */
+    radial-gradient(at 100% 100%, rgba(148, 163, 184, 0.1) 0px, transparent 50%);
+  /* Slate */
+  background-attachment: fixed;
+  background-size: cover;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  @apply font-bold text-slate-900;
+}
+
+/* Custom Scrollbar - Minimal */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-slate-300 rounded-full hover:bg-slate-400 transition-colors;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+/* Glassmorphism Utilities - Dashboard Style */
+.glass-panel {
+  @apply bg-white/80 backdrop-blur-xl border border-white/60 shadow-xl shadow-slate-200/50 rounded-2xl;
+}
+
+.glass-card {
+  @apply bg-white border border-slate-100 shadow-sm rounded-xl;
+}
+
+/* Floating Label Input (Material/Tailwind style) */
+.floating-input {
+  @apply block px-4 pb-2.5 pt-5 w-full text-sm text-slate-900 bg-white border border-slate-200 rounded-xl appearance-none focus:outline-none focus:ring-0 focus:border-indigo-600 transition-all;
+}
+
+.floating-label {
+  @apply absolute text-sm text-slate-500 duration-300 transform -translate-y-4 scale-75 top-4 z-10 origin-[0] left-4 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4 peer-focus:text-indigo-600;
+}
+
+/* Zebra Striped Table */
+.table-modern {
+  @apply w-full text-sm text-left text-slate-600;
+}
+
+.table-modern thead {
+  @apply text-xs text-slate-500 uppercase bg-slate-50/80 border-b border-slate-200;
+}
+
+.table-modern th {
+  @apply px-6 py-3 font-semibold;
+}
+
+.table-modern tbody tr {
+  @apply border-b border-slate-100 hover:bg-slate-50 transition-colors;
+}
+
+.table-modern td {
+  @apply px-6 py-4;
+}
+
+/* Badges */
+.badge {
+  @apply text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wide border;
+}
+
+.badge-success {
+  @apply bg-emerald-50 text-emerald-700 border-emerald-200;
+}
+
+.badge-warning {
+  @apply bg-amber-50 text-amber-700 border-amber-200;
+}

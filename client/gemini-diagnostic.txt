@@ -1,0 +1,68 @@
+---------------------------------------------------
+🔍 DIAGNOSTIK GEMINI API - 2026-02-15T05:24:33.531Z
+---------------------------------------------------
+✅ API Key detected (Length: 39)
+
+👉 Testing Model: gemini-1.5-flash
+❌ FAILED [gemini-1.5-flash]:
+   Message: [GoogleGenerativeAI Error]: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent: [404 Not Found] models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.
+
+👉 Testing Model: gemini-pro
+❌ FAILED [gemini-pro]:
+   Message: [GoogleGenerativeAI Error]: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent: [404 Not Found] models/gemini-pro is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.
+
+---------------------------------------------------
+❌ KESIMPULAN: Semua percobaan model gagal.
+---------------------------------------------------
+---------------------------------------------------
+🔍 DIAGNOSTIK GEMINI API - LIST MODELS - 2026-02-15T05:25:04.070Z
+---------------------------------------------------
+✅ API Key detected (Length: 39)
+👉 Fetching available models from Google API...
+✅ Available Models:
+   - models/gemini-2.5-flash [✅ generateContent]
+   - models/gemini-2.5-pro [✅ generateContent]
+   - models/gemini-2.0-flash [✅ generateContent]
+   - models/gemini-2.0-flash-001 [✅ generateContent]
+   - models/gemini-2.0-flash-exp-image-generation [✅ generateContent]
+   - models/gemini-2.0-flash-lite-001 [✅ generateContent]
+   - models/gemini-2.0-flash-lite [✅ generateContent]
+   - models/gemini-exp-1206 [✅ generateContent]
+   - models/gemini-2.5-flash-preview-tts [✅ generateContent]
+   - models/gemini-2.5-pro-preview-tts [✅ generateContent]
+   - models/gemma-3-1b-it [✅ generateContent]
+   - models/gemma-3-4b-it [✅ generateContent]
+   - models/gemma-3-12b-it [✅ generateContent]
+   - models/gemma-3-27b-it [✅ generateContent]
+   - models/gemma-3n-e4b-it [✅ generateContent]
+   - models/gemma-3n-e2b-it [✅ generateContent]
+   - models/gemini-flash-latest [✅ generateContent]
+   - models/gemini-flash-lite-latest [✅ generateContent]
+   - models/gemini-pro-latest [✅ generateContent]
+   - models/gemini-2.5-flash-lite [✅ generateContent]
+   - models/gemini-2.5-flash-image [✅ generateContent]
+   - models/gemini-2.5-flash-preview-09-2025 [✅ generateContent]
+   - models/gemini-2.5-flash-lite-preview-09-2025 [✅ generateContent]
+   - models/gemini-3-pro-preview [✅ generateContent]
+   - models/gemini-3-flash-preview [✅ generateContent]
+   - models/gemini-3-pro-image-preview [✅ generateContent]
+   - models/nano-banana-pro-preview [✅ generateContent]
+   - models/gemini-robotics-er-1.5-preview [✅ generateContent]
+   - models/gemini-2.5-computer-use-preview-10-2025 [✅ generateContent]
+   - models/deep-research-pro-preview-12-2025 [✅ generateContent]
+   - models/gemini-embedding-001 [❌ generateContent]
+   - models/aqa [❌ generateContent]
+   - models/imagen-4.0-generate-preview-06-06 [❌ generateContent]
+   - models/imagen-4.0-ultra-generate-preview-06-06 [❌ generateContent]
+   - models/imagen-4.0-generate-001 [❌ generateContent]
+   - models/imagen-4.0-ultra-generate-001 [❌ generateContent]
+   - models/imagen-4.0-fast-generate-001 [❌ generateContent]
+   - models/veo-2.0-generate-001 [❌ generateContent]
+   - models/veo-3.0-generate-001 [❌ generateContent]
+   - models/veo-3.0-fast-generate-001 [❌ generateContent]
+   - models/veo-3.1-generate-preview [❌ generateContent]
+   - models/veo-3.1-fast-generate-preview [❌ generateContent]
+   - models/gemini-2.5-flash-native-audio-latest [❌ generateContent]
+   - models/gemini-2.5-flash-native-audio-preview-09-2025 [❌ generateContent]
+   - models/gemini-2.5-flash-native-audio-preview-12-2025 [❌ generateContent]
+---------------------------------------------------
