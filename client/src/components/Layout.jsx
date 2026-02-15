@@ -151,7 +151,7 @@ const Layout = ({ children, onLogout, ...args }) => {
 
                     <div className="mt-6 pt-6 border-t border-slate-100">
                         <p className="text-xs text-slate-400">
-                            Develop with <Heart size={10} className="inline text-red-500" /> by Antigravity
+                            Develop by Papeda Edukasi
                         </p>
                     </div>
                 </div>
