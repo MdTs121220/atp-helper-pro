@@ -34,8 +34,8 @@ const MagicBoxInput = ({ onAnalyze }) => {
         setError(null);
 
         try {
-            const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-            const response = await fetch(`${apiUrl}/api/atp/generate`, {
+            // Use relative path - handled by Vite proxy locally and Vercel rewrites in production
+            const response = await fetch('/api/atp/generate', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ text })
