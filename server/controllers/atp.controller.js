@@ -9,7 +9,9 @@ export const generateATP = async (req, res) => {
         if (!text) return res.status(400).json({ error: 'Teks CP tidak boleh kosong.' });
 
         // --- GOOGLE GEMINI STRATEGY ---
-        if (process.env.GEMINI_API_KEY) {
+        const apiKey = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY;
+
+        if (apiKey) {
             // Updated models based on diagnostic test
             const models = [
                 "gemini-2.0-flash",
@@ -21,7 +23,7 @@ export const generateATP = async (req, res) => {
             for (const modelName of models) {
                 try {
                     console.log(`Trying Gemini model: ${modelName}...`);
-                    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+                    const genAI = new GoogleGenerativeAI(apiKey);
                     const model = genAI.getGenerativeModel({ model: modelName });
 
                     const prompt = `
@@ -97,29 +99,45 @@ TOLONG EKSTRAK "Fase", "Elemen", dan "Deskripsi CP" dari teks di atas jika ada, 
             "Teknologi Jaringan Kabel dan Nirkabel"
         ];
 
+        // --- OFFLINE MODE / FALLBACK ---
+        console.log("Gemini failed or missing key. Activating Offline Simulation Mode.");
+
+        // Attempt to extract some context from the input text
+        const detectedFaseOffline = text.match(/Fase\s+([A-F])/i)?.[1] || "F";
+
+        // Mock data in new format
         const mockATP = {
-            mataPelajaran: detectedMapel,
-            fase: detectedFase,
-            note: "Data ini adalah simulasi karena Koneksi AI Bermasalah. Silakan edit.",
-            elemenList: elementsToUse.map((elemName, index) => ({
-                name: elemName,
-                tps: [
-                    {
-                        text: `Peserta didik mampu memahami dan menganalisis ${elemName} sesuai standar industri.`,
-                        kko: "memahami",
-                        materi: elemName,
-                        alokasiWaktu: "6 JP",
-                        assessment: "Tes Tertulis"
-                    },
-                    {
-                        text: `Peserta didik mampu menerapkan konfigurasi pada ${elemName} dengan perangkat nyata.`,
-                        kko: "menerapkan",
-                        materi: `Praktikum ${elemName}`,
-                        alokasiWaktu: "8 JP",
-                        assessment: "Uji Kinerja"
-                    }
-                ]
-            }))
+            analisis_kurikulum: "Mode Offline: Simulasi ATP berdasarkan struktur kurikulum standar karena koneksi AI tidak tersedia.",
+            data_tp: [
+                {
+                    kode: `${detectedFaseOffline}.1`,
+                    tp: `Menganalisis prinsip dasar sistem jaringan komputer dan telekomunikasi (Simulasi Offline)`,
+                    lingkup_materi: "Prinsip Dasar Jaringan",
+                    jp: "6 JP",
+                    indikator: "Peserta didik mampu menjelaskan prinsip kerja jaringan",
+                    level_kognitif: "C4 (Analisis)",
+                    elemen: "Perencanaan Jaringan"
+                },
+                {
+                    kode: `${detectedFase}.2`,
+                    tp: `Merancang topologi jaringan sederhana menggunakan aplikasi simulasi`,
+                    lingkup_materi: "Perancangan Topologi",
+                    jp: "8 JP",
+                    indikator: "Peserta didik mampu membuat desain topologi yang valid",
+                    level_kognitif: "C6 (Mencipta)",
+                    elemen: "Perencanaan Jaringan"
+                },
+                {
+                    kode: `${detectedFase}.3`,
+                    tp: `Menerapkan konfigurasi dasar pada perangkat router dan switch`,
+                    lingkup_materi: "Konfigurasi Perangkat",
+                    jp: "12 JP",
+                    indikator: "Peserta didik mampu melakukan konfigurasi dasar CLI",
+                    level_kognitif: "P3 (Presisi)",
+                    elemen: "Teknologi Jaringan"
+                }
+            ],
+            logika_alur: "Pengurutan dari konsep abstrak ke praktikum konkret (Simulasi)."
         };
 
         res.json(mockATP);
