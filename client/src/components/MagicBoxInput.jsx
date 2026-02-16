@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Wand2, Loader2, FileText, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Wand2, Loader2, FileText, CheckCircle2, AlertCircle, RotateCcw } from 'lucide-react'; // Added RotateCcw
 import { smartParser } from '../utils/smartParser';
 
 const MagicBoxInput = ({ onAnalyze }) => {
@@ -22,6 +22,13 @@ const MagicBoxInput = ({ onAnalyze }) => {
         } else {
             setDetectedData(null);
         }
+    };
+
+    const handleReset = () => {
+        setText('');
+        setDetectedData(null);
+        setError(null);
+        setIsAnalyzing(false);
     };
 
     const handleAnalyze = async () => {
@@ -104,7 +111,18 @@ const MagicBoxInput = ({ onAnalyze }) => {
                         </div>
                     )}
 
-                    <div className="absolute bottom-4 right-4">
+                    <div className="absolute bottom-4 right-4 flex space-x-2">
+                        {text.trim() && (
+                            <button
+                                onClick={handleReset}
+                                disabled={isAnalyzing}
+                                className="flex items-center space-x-2 px-4 py-2.5 rounded-full font-bold text-slate-600 bg-white hover:bg-slate-100 border border-slate-200 shadow-sm transition-all"
+                                title="Reset"
+                            >
+                                <RotateCcw size={18} />
+                                <span>Reset</span>
+                            </button>
+                        )}
                         <button
                             onClick={handleAnalyze}
                             disabled={isAnalyzing || !text.trim()}
