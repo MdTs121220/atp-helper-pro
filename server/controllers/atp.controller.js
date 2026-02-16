@@ -25,13 +25,36 @@ export const generateATP = async (req, res) => {
                     const model = genAI.getGenerativeModel({ model: modelName });
 
                     const prompt = `
-                      Kamu adalah pakar kurikulum SMK TKJ. Analisis CP ini: "${text}".
-                      Ekstrak ATP dalam format JSON murni:
-                      {
-                        "mataPelajaran": "Mapel",
-                        "fase": "Fase",
-                        "elemenList": [{ "name": "Elemen", "tps": [{ "text": "TP", "kko": "KKO", "materi": "Materi", "alokasiWaktu": "JP", "assessment": "Asesmen" }] }]
-                      }
+### ROLE: LEAD CURRICULUM ARCHITECT (KEMENTERIAN PENDIDIKAN - REVISI 2025)
+Tugas Anda adalah membedah Capaian Pembelajaran (CP) menjadi Tujuan Pembelajaran (TP) yang atomik dan menyusunnya menjadi Alur Tujuan Pembelajaran (ATP) yang logis.
+
+### INPUT TEXT:
+"${text}"
+
+TOLONG EKSTRAK "Fase", "Elemen", dan "Deskripsi CP" dari teks di atas jika ada, lalu buat ATP.
+
+### ATURAN PENULISAN (CRITICAL RULES):
+1. **DILARANG REPETISI:** Jangan menggunakan kata pembuka yang sama di setiap baris TP. Variasikan kata kerja dan struktur kalimat.
+2. **ATOMISASI MATERI:** Bedah Deskripsi CP menjadi unit-unit kecil. Satu TP hanya boleh fokus pada SATU sub-materi spesifik.
+3. **RUMUS TP:** [Kata Kerja Operasional/KKO] + [Materi Inti] + [Konteks Implementasi].
+4. **URUTAN ATP:** Susun dari yang paling mudah (Konkret) ke yang paling sulit (Abstrak).
+
+### FORMAT OUTPUT (WAJIB JSON MURNI):
+{
+  "analisis_kurikulum": "Penjelasan singkat pendekatan untuk Fase dan Mapel ini.",
+  "data_tp": [
+    {
+      "kode": "Kode (Misal: F.1, F.2)",
+      "tp": "Rumusan TP yang bervariatif dan spesifik",
+      "lingkup_materi": "Nama Sub-Materi",
+      "jp": "Estimasi JP (Angka String, misal '6 JP')",
+      "indikator": "Cara menguji keberhasilan siswa",
+      "level_kognitif": "Bloom C2-C6 & SOLO Level",
+      "elemen": "Nama Elemen (Jika ada, atau 'Umum')"
+    }
+  ],
+  "logika_alur": "Alasan pengurutan materi ini."
+}
                     `;
 
                     const result = await model.generateContent(prompt);
@@ -43,6 +66,13 @@ export const generateATP = async (req, res) => {
 
                     // Validate JSON before sending
                     const json = JSON.parse(textRes);
+
+                    // Normalize for frontend if needed, but we will handle mapping on client too.
+                    // For safety, ensure data_tp exists
+                    if (!json.data_tp) {
+                        throw new Error("Invalid structure: missing data_tp");
+                    }
+
                     res.json(json);
                     return; // Success!
 

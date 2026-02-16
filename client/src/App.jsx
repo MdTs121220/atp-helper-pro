@@ -54,36 +54,73 @@ function App() {
   };
 
   // Magic Analysis Handler
+  // Magic Analysis Handler
   const handleMagicAnalysis = (result) => {
-    // 1. Update Identity if detected
-    if (result.fase || result.mataPelajaran) {
-      setIdentity(prev => ({
-        ...prev,
-        fase: result.fase || prev.fase,
-        mapel: result.mataPelajaran || prev.mapel
+    // Check if result has the new structure (data_tp) or legacy structure (elemenList)
+    if (result.data_tp) {
+      // --- NEW STRUCTURE HANDLER ---
+
+      // Note: We might want to use result.analisis_kurikulum or result.logika_alur somewhere in UI later
+      // For now, we focus on mapping data_tp to our tpList
+
+      const newTPs = result.data_tp.map((item, index) => ({
+        id: Date.now() + index, // Generate temporary ID
+        code: item.kode || `${identity.fase || 'X'}.${index + 1}`,
+        text: item.tp,
+        materi: item.lingkup_materi,
+        alokasiWaktu: item.jp,
+        assessment: item.elemen ? `[${item.elemen}] ${item.indikator}` : item.indikator, // Combine Element + Indikator if available
+        level_kognitif: item.level_kognitif,
+        elementName: item.elemen || 'Umum',
+        kko: "", // New prompt doesn't strictly separate KKO in JSON, so we leave blank or try to extract from text if needed. 
+        // Actually, prompt asks for "Rumusan TP". 
+        // If we want KKO highlighting, we'd need to parse it or ask AI to separate it. 
+        // For now, let's leave KKO blank to avoid errors.
+        dateCreated: Date.now()
       }));
-    }
 
-    // 2. Clear old TPs and add new ones from all elements
-    const newTPs = [];
-    result.elemenList.forEach(element => {
-      element.tps.forEach(tp => {
-        newTPs.push({
-          ...tp,
-          elementName: element.name,
-          // Ensure code is unique or re-indexed later
-          dateCreated: Date.now()
+      setTpList(newTPs);
+
+      // Attempt to update identity if common fields are detected (though specific prompt might not return them in root)
+      // The prompt asks to extract Phase/Element but doesn't explicitly put them in root JSON keys except "fase" in old prompt.
+      // New prompt output schema doesn't have root "fase" or "mataPelajaran".
+      // We rely on what users put in IdentityForm or what MagicBoxInput detected locally.
+
+    } else {
+      // --- LEGACY/OFFLINE STRUCTURE HANDLER ---
+
+      // 1. Update Identity if detected
+      if (result.fase || result.mataPelajaran) {
+        setIdentity(prev => ({
+          ...prev,
+          fase: result.fase || prev.fase,
+          mapel: result.mataPelajaran || prev.mapel
+        }));
+      }
+
+      // 2. Clear old TPs and add new ones from all elements
+      const newTPs = [];
+      if (result.elemenList) {
+        result.elemenList.forEach(element => {
+          element.tps.forEach(tp => {
+            newTPs.push({
+              ...tp,
+              elementName: element.name,
+              // Ensure code is unique or re-indexed later
+              dateCreated: Date.now()
+            });
+          });
         });
-      });
-    });
+      }
 
-    // Re-index codes globally for the table
-    const reindexedTPs = newTPs.map((tp, index) => ({
-      ...tp,
-      code: `${result.fase || identity.fase || 'X'}.${index + 1}`
-    }));
+      // Re-index codes globally for the table
+      const reindexedTPs = newTPs.map((tp, index) => ({
+        ...tp,
+        code: `${result.fase || identity.fase || 'X'}.${index + 1}`
+      }));
 
-    setTpList(reindexedTPs);
+      setTpList(reindexedTPs);
+    }
   };
 
   const handleReorderTP = (newOrder) => {
