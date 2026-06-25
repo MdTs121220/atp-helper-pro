@@ -184,21 +184,30 @@ function App() {
                 </p>
               </div>
 
-              {/* Mode Switcher */}
-              <div className="flex items-center gap-1 rounded-lg border border-slate-200 bg-slate-50 p-1">
-                <button
-                  onClick={() => setMode('classic')}
-                  className={`rounded-md px-4 py-2 text-xs font-bold transition-all ${mode === 'classic' ? 'bg-white text-slate-950 shadow-sm' : 'text-slate-500 hover:text-slate-800'}`}
-                >
-                  Manual / Klasik
-                </button>
-                <button
-                  onClick={() => setMode('magic')}
-                  className={`flex items-center rounded-md px-4 py-2 text-xs font-bold transition-all ${mode === 'magic' ? 'bg-slate-950 text-white shadow-sm' : 'text-slate-500 hover:text-slate-800'}`}
-                >
-                  <Sparkles size={12} className="mr-1" />
-                  AI Assistant
-                </button>
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                {aiConfig && (
+                  <span className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs font-bold text-emerald-700">
+                    AI Override Aktif
+                  </span>
+                )}
+                <AdminAISettings onConfigChange={setAiConfig} />
+
+                {/* Mode Switcher */}
+                <div className="flex items-center gap-1 rounded-lg border border-slate-200 bg-slate-50 p-1">
+                  <button
+                    onClick={() => setMode('classic')}
+                    className={`rounded-md px-4 py-2 text-xs font-bold transition-all ${mode === 'classic' ? 'bg-white text-slate-950 shadow-sm' : 'text-slate-500 hover:text-slate-800'}`}
+                  >
+                    Manual / Klasik
+                  </button>
+                  <button
+                    onClick={() => setMode('magic')}
+                    className={`flex items-center rounded-md px-4 py-2 text-xs font-bold transition-all ${mode === 'magic' ? 'bg-slate-950 text-white shadow-sm' : 'text-slate-500 hover:text-slate-800'}`}
+                  >
+                    <Sparkles size={12} className="mr-1" />
+                    AI Assistant
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -222,14 +231,6 @@ function App() {
                     <h3 className="font-black text-slate-800">
                       {mode === 'magic' ? 'Hasil Analisis AI & Preview ATP' : 'Draf Alur Tujuan Pembelajaran'}
                     </h3>
-                    <div className="flex items-center gap-3">
-                      {aiConfig && (
-                        <span className="hidden rounded-full bg-emerald-50 px-3 py-1 text-[11px] font-bold text-emerald-700 md:inline-flex">
-                          AI Override Aktif
-                        </span>
-                      )}
-                      <AdminAISettings onConfigChange={setAiConfig} />
-                    </div>
                   </div>
 
                   {mode === 'magic' && tpList.length > 0 ? (

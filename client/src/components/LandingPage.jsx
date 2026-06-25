@@ -14,7 +14,7 @@ const LandingPage = ({ onStart }) => {
                     </div>
                     <div>
                         <p className="text-lg font-extrabold tracking-tight">ATP Helper Pro</p>
-                        <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-cyan-300">PPA 2025 Ready</p>
+                        <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-cyan-100">PPA 2025 Ready</p>
                     </div>
                 </div>
                 <button
@@ -30,7 +30,7 @@ const LandingPage = ({ onStart }) => {
 
                 <div className="relative mx-auto grid min-h-[calc(100vh-132px)] max-w-7xl grid-cols-1 items-center gap-10 px-5 py-12 lg:grid-cols-[0.92fr_1.08fr]">
                     <section className="max-w-3xl">
-                        <div className="mb-6 inline-flex items-center gap-2 rounded-lg border border-cyan-300/25 bg-cyan-300/10 px-3 py-2 text-xs font-bold uppercase tracking-[0.18em] text-cyan-200">
+                        <div className="mb-6 inline-flex items-center gap-2 rounded-lg border border-cyan-200/60 bg-cyan-200/15 px-3 py-2 text-xs font-bold uppercase tracking-[0.18em] text-cyan-50">
                             <BookOpenCheck size={15} />
                             CP ke TP dan ATP berbasis panduan resmi
                         </div>
@@ -39,7 +39,7 @@ const LandingPage = ({ onStart }) => {
                             Susun ATP guru dari CP pemerintah dengan alur yang benar.
                         </h1>
 
-                        <p className="mt-6 max-w-2xl text-base leading-8 text-slate-300 md:text-lg">
+                        <p className="mt-6 max-w-2xl text-base leading-8 text-slate-100 md:text-lg">
                             Tempel CP lengkap beserta elemen dan sub-elemen. AI akan menganalisis CP, merumuskan TP, mengurutkan ATP, lalu menyiapkan KKTP serta asesmen formatif dan sumatif.
                         </p>
 
@@ -53,13 +53,13 @@ const LandingPage = ({ onStart }) => {
                             </button>
                             <button
                                 onClick={() => setShowGuide(true)}
-                                className="inline-flex items-center justify-center rounded-lg border border-white/15 px-6 py-3 text-sm font-bold text-white transition hover:border-white/40 hover:bg-white/10"
+                                className="inline-flex items-center justify-center rounded-lg border border-white/40 bg-white/5 px-6 py-3 text-sm font-bold text-white transition hover:border-white hover:bg-white/15"
                             >
                                 Lihat Alur Kerja
                             </button>
                         </div>
 
-                        <div className="mt-10 grid grid-cols-1 gap-3 text-sm text-slate-300 sm:grid-cols-3">
+                        <div className="mt-10 grid grid-cols-1 gap-3 text-sm font-semibold text-white sm:grid-cols-3">
                             <div className="flex items-center gap-2">
                                 <CheckCircle2 size={18} className="text-emerald-300" />
                                 Analisis elemen CP
@@ -76,19 +76,19 @@ const LandingPage = ({ onStart }) => {
                     </section>
 
                     <section className="relative">
-                        <div className="rounded-lg border border-white/15 bg-white/[0.06] p-3 shadow-2xl shadow-black/30 backdrop-blur">
-                            <div className="rounded-md border border-white/10 bg-slate-900">
+                        <div className="rounded-lg border border-white/25 bg-white/[0.09] p-3 shadow-2xl shadow-black/30 backdrop-blur">
+                            <div className="rounded-md border border-white/20 bg-slate-900">
                                 <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
                                     <div>
-                                        <p className="text-xs font-bold uppercase tracking-[0.18em] text-cyan-300">Preview ATP</p>
+                                        <p className="text-xs font-bold uppercase tracking-[0.18em] text-cyan-100">Preview ATP</p>
                                         <p className="mt-1 text-sm font-bold text-white">IPAS - Fase B</p>
                                     </div>
-                                    <span className="rounded bg-emerald-400/15 px-2 py-1 text-[11px] font-bold text-emerald-200">AI aktif</span>
+                                    <span className="rounded bg-emerald-300 px-2 py-1 text-[11px] font-black text-slate-950">AI aktif</span>
                                 </div>
                                 <div className="grid gap-3 p-4">
                                     <div className="rounded border border-cyan-300/20 bg-cyan-300/10 p-3">
-                                        <p className="text-[11px] font-bold uppercase text-cyan-200">Analisis CP</p>
-                                        <p className="mt-1 text-sm leading-6 text-slate-200">Elemen dan sub-elemen dibaca sebelum TP dirumuskan.</p>
+                                        <p className="text-[11px] font-bold uppercase text-cyan-50">Analisis CP</p>
+                                        <p className="mt-1 text-sm leading-6 text-white">Elemen dan sub-elemen dibaca sebelum TP dirumuskan.</p>
                                     </div>
                                     {[
                                         ['B.1', 'Mengidentifikasi sumber daya alam di lingkungan sekitar.', 'Memahami'],
@@ -96,9 +96,9 @@ const LandingPage = ({ onStart }) => {
                                         ['B.3', 'Menyajikan laporan sederhana hasil pengamatan.', 'Merefleksi']
                                     ].map(([code, text, phase]) => (
                                         <div key={code} className="grid grid-cols-[64px_1fr_110px] gap-3 rounded border border-white/10 bg-white/[0.04] p-3 text-sm">
-                                            <span className="font-mono font-black text-cyan-200">{code}</span>
-                                            <span className="text-slate-200">{text}</span>
-                                            <span className="text-right text-xs font-bold text-amber-200">{phase}</span>
+                                            <span className="font-mono font-black text-cyan-50">{code}</span>
+                                            <span className="text-white">{text}</span>
+                                            <span className="text-right text-xs font-bold text-amber-100">{phase}</span>
                                         </div>
                                     ))}
                                 </div>
@@ -109,24 +109,24 @@ const LandingPage = ({ onStart }) => {
             </main>
 
             <section className="mx-auto grid max-w-7xl grid-cols-1 gap-4 px-5 py-8 md:grid-cols-3">
-                <div className="rounded-lg border border-white/10 bg-white/[0.04] p-5">
-                    <Cpu className="mb-4 text-cyan-300" size={24} />
+                <div className="rounded-lg border border-white/20 bg-white/[0.08] p-5">
+                    <Cpu className="mb-4 text-cyan-100" size={24} />
                     <h3 className="text-base font-extrabold text-white">Multi AI Engine</h3>
-                    <p className="mt-2 text-sm leading-6 text-slate-400">Gemini, NVIDIA, atau endpoint OpenAI-compatible bisa diuji dari admin console.</p>
+                    <p className="mt-2 text-sm leading-6 text-slate-100">Gemini, NVIDIA, atau endpoint OpenAI-compatible bisa diuji dari admin console.</p>
                 </div>
-                <div className="rounded-lg border border-white/10 bg-white/[0.04] p-5">
-                    <ShieldCheck className="mb-4 text-emerald-300" size={24} />
+                <div className="rounded-lg border border-white/20 bg-white/[0.08] p-5">
+                    <ShieldCheck className="mb-4 text-emerald-100" size={24} />
                     <h3 className="text-base font-extrabold text-white">Sesuai PPA</h3>
-                    <p className="mt-2 text-sm leading-6 text-slate-400">Formatif tidak dicampur ke nilai akhir, sumatif dikaitkan ke KKTP.</p>
+                    <p className="mt-2 text-sm leading-6 text-slate-100">Formatif tidak dicampur ke nilai akhir, sumatif dikaitkan ke KKTP.</p>
                 </div>
-                <div className="rounded-lg border border-white/10 bg-white/[0.04] p-5">
-                    <FileSpreadsheet className="mb-4 text-amber-300" size={24} />
+                <div className="rounded-lg border border-white/20 bg-white/[0.08] p-5">
+                    <FileSpreadsheet className="mb-4 text-amber-100" size={24} />
                     <h3 className="text-base font-extrabold text-white">Siap Pakai</h3>
-                    <p className="mt-2 text-sm leading-6 text-slate-400">Hasil dapat diedit, divalidasi guru, lalu diekspor ke Excel, PDF, atau teks.</p>
+                    <p className="mt-2 text-sm leading-6 text-slate-100">Hasil dapat diedit, divalidasi guru, lalu diekspor ke Excel, PDF, atau teks.</p>
                 </div>
             </section>
 
-            <footer className="border-t border-white/10 px-5 py-5 text-center text-xs font-semibold text-slate-500">
+            <footer className="border-t border-white/20 px-5 py-5 text-center text-xs font-semibold text-slate-200">
                 &copy; {new Date().getFullYear()} ATP Helper Pro - Dibuat untuk Guru Indonesia.
             </footer>
 
