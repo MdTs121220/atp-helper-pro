@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { GraduationCap, BookOpen, Heart, CheckCircle2, AlertTriangle, Cpu } from 'lucide-react';
 import InfoModal from './InfoModal';
 
-const Layout = ({ children, onLogout, ...args }) => {
+const Layout = ({ children, onLogout }) => {
     const [activeModal, setActiveModal] = useState(null); // 'guide', 'about', or null
 
     return (

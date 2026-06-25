@@ -1,25 +1,23 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Shield, Lock, X, Check, RefreshCw } from 'lucide-react';
 
 const SecurityCheck = ({ onSuccess, onCancel }) => {
-    const [num1, setNum1] = useState(0);
-    const [num2, setNum2] = useState(0);
+    const createProblem = () => ({
+        num1: Math.floor(Math.random() * 10) + 1,
+        num2: Math.floor(Math.random() * 10) + 1
+    });
+
+    const [problem, setProblem] = useState(createProblem);
     const [answer, setAnswer] = useState('');
     const [error, setError] = useState(false);
+    const { num1, num2 } = problem;
 
     // Generate random math problem
     const generateProblem = () => {
-        const n1 = Math.floor(Math.random() * 10) + 1;
-        const n2 = Math.floor(Math.random() * 10) + 1;
-        setNum1(n1);
-        setNum2(n2);
+        setProblem(createProblem());
         setAnswer('');
         setError(false);
     };
-
-    useEffect(() => {
-        generateProblem();
-    }, []);
 
     const handleSubmit = (e) => {
         e.preventDefault();

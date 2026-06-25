@@ -12,7 +12,6 @@ const IdentityForm = ({ data, onChange }) => {
     };
 
     const isTerbatas = data.kondisi === 'terbatas';
-    const accentColor = isTerbatas ? 'text-amber-600' : 'text-indigo-600';
     const ringColor = isTerbatas ? 'focus:border-amber-500' : 'focus:border-indigo-600';
     const labelColor = isTerbatas ? 'peer-focus:text-amber-600' : 'peer-focus:text-indigo-600';
 

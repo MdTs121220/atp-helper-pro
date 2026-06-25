@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Wand2, Loader2, FileText, CheckCircle2, AlertCircle, RotateCcw } from 'lucide-react'; // Added RotateCcw
 import { smartParser } from '../utils/smartParser';
 
-const MagicBoxInput = ({ onAnalyze }) => {
+const MagicBoxInput = ({ onAnalyze, identity }) => {
     const [text, setText] = useState('');
     const [isAnalyzing, setIsAnalyzing] = useState(false);
     const [detectedData, setDetectedData] = useState(null);
@@ -45,7 +45,7 @@ const MagicBoxInput = ({ onAnalyze }) => {
             const response = await fetch('/api/atp/generate', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ text })
+                body: JSON.stringify({ text, identity })
             });
 
             const data = await response.json();
@@ -76,8 +76,8 @@ const MagicBoxInput = ({ onAnalyze }) => {
                             <Wand2 size={24} />
                         </div>
                         <div>
-                            <h3 className="text-xl font-bold text-slate-800">The Magic Box</h3>
-                            <p className="text-xs text-slate-500">Paste CP Anda di sini, AI akan menyusun ATP otomatis.</p>
+                            <h3 className="text-xl font-bold text-slate-800">AI Penyusun TP & ATP</h3>
+                            <p className="text-xs text-slate-500">Tempel CP lengkap, termasuk elemen dan sub-elemen bila ada.</p>
                         </div>
                     </div>
                     {detectedData && (
@@ -101,7 +101,7 @@ const MagicBoxInput = ({ onAnalyze }) => {
                         value={text}
                         onChange={handleTextChange}
                         className={`w-full h-48 p-4 text-sm text-slate-700 bg-slate-50 border rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all resize-none shadow-inner ${error ? 'border-red-300 bg-red-50' : 'border-slate-200'}`}
-                        placeholder="Tempelkan teks Capaian Pembelajaran (CP) lengkap di sini..."
+                        placeholder="Tempelkan CP pemerintah lengkap di sini. Idealnya memuat Fase, Mata Pelajaran, Elemen, Sub Elemen, dan isi CP..."
                     ></textarea>
 
                     {error && (
@@ -139,7 +139,7 @@ const MagicBoxInput = ({ onAnalyze }) => {
                             ) : (
                                 <>
                                     <Wand2 size={18} />
-                                    <span>Generate ATP</span>
+                                    <span>Susun TP & ATP</span>
                                 </>
                             )}
                         </button>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Sparkles, Split, ArrowDown, Type, Zap, Check } from 'lucide-react';
 import { adjustCompetency } from '../utils/competencyMapper';
 
@@ -20,7 +20,7 @@ const CPAnalysis = ({ onAddTP, kondisi }) => {
         if (!competency || !material) return;
 
         // Final check logic
-        const { adjusted, isChanged } = adjustCompetency(competency, kondisi === 'terbatas');
+        const { adjusted } = adjustCompetency(competency, kondisi === 'terbatas');
 
         const newTP = {
             id: Date.now().toString(),

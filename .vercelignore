@@ -1,0 +1,8 @@
+node_modules
+client/node_modules
+dist
+client/dist
+tmp
+*.pdf
+build_log.txt
+client/gemini-diagnostic.txt

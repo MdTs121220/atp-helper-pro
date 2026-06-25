@@ -16,7 +16,13 @@ const ExportMenu = ({ identity, tpList }) => {
             tujuanPembelajaran: tp.text,
             lingkupMateri: tp.materi || tp.material || '-', // Handle both keys
             alokasiWaktu: tp.alokasiWaktu || '2 JP',
-            assessment: tp.assessment || '-'
+            elemen: tp.elementName || 'Umum',
+            subElemen: tp.subElementName || '',
+            pengalamanBelajar: tp.pengalamanBelajar || '',
+            kktp: tp.assessment || '-',
+            asesmenFormatif: tp.asesmenFormatif || '-',
+            asesmenSumatif: tp.asesmenSumatif || '-',
+            alasanUrutan: tp.alasanUrutan || '-'
         }));
     };
 
@@ -36,15 +42,20 @@ const ExportMenu = ({ identity, tpList }) => {
                 ['ALUR TUJUAN PEMBELAJARAN (ATP)']
             ];
 
-            // Added Assessment Column
-            const tableHeader = [['No', 'Kode TP', 'Tujuan Pembelajaran', 'Lingkup Materi', 'JP', 'Indikator Asesmen']];
+            const tableHeader = [['No', 'Kode TP', 'Elemen', 'Sub Elemen', 'Tujuan Pembelajaran', 'Lingkup Materi', 'JP', 'Pengalaman Belajar', 'KKTP', 'Asesmen Formatif', 'Asesmen Sumatif', 'Alasan Urutan']];
             const tableBody = getFormattedData().map(item => [
                 item.no,
                 item.kode,
+                item.elemen,
+                item.subElemen,
                 item.tujuanPembelajaran,
                 item.lingkupMateri,
                 item.alokasiWaktu,
-                item.assessment
+                item.pengalamanBelajar,
+                item.kktp,
+                item.asesmenFormatif,
+                item.asesmenSumatif,
+                item.alasanUrutan
             ]);
 
             const worksheet = XLSX.utils.aoa_to_sheet([...identityData, ...tableHeader, ...tableBody]);
@@ -53,10 +64,16 @@ const ExportMenu = ({ identity, tpList }) => {
             const wscols = [
                 { wch: 5 },  // No
                 { wch: 10 }, // Kode
+                { wch: 22 }, // Elemen
+                { wch: 22 }, // Sub Elemen
                 { wch: 50 }, // TP
                 { wch: 25 }, // Materi
                 { wch: 8 },  // JP
-                { wch: 25 }  // Assessment
+                { wch: 18 }, // Pengalaman
+                { wch: 35 }, // KKTP
+                { wch: 35 }, // Formatif
+                { wch: 35 }, // Sumatif
+                { wch: 35 }  // Urutan
             ];
             worksheet['!cols'] = wscols;
 
@@ -90,14 +107,17 @@ const ExportMenu = ({ identity, tpList }) => {
 
             autoTable(doc, {
                 startY: yPos + 10,
-                head: [['No', 'Kode', 'Tujuan Pembelajaran', 'Lingkup Materi', 'JP', 'Indikator Asesmen']],
+                head: [['No', 'Kode', 'Elemen', 'Tujuan Pembelajaran', 'Materi', 'JP', 'KKTP', 'Asesmen', 'Urutan']],
                 body: getFormattedData().map(item => [
                     item.no,
                     item.kode,
+                    item.subElemen ? `${item.elemen} / ${item.subElemen}` : item.elemen,
                     item.tujuanPembelajaran,
                     item.lingkupMateri,
                     item.alokasiWaktu,
-                    item.assessment
+                    item.kktp,
+                    `Formatif: ${item.asesmenFormatif}\nSumatif: ${item.asesmenSumatif}`,
+                    item.alasanUrutan
                 ]),
                 theme: 'grid',
                 headStyles: {
@@ -116,12 +136,15 @@ const ExportMenu = ({ identity, tpList }) => {
                 columnStyles: {
                     0: { cellWidth: 10, halign: 'center' },
                     1: { cellWidth: 18, halign: 'center', fontStyle: 'bold' },
-                    2: { cellWidth: 'auto' }, // TP gets remaining space
-                    3: { cellWidth: 45 },    // Materi
-                    4: { cellWidth: 15, halign: 'center' },
-                    5: { cellWidth: 45 }     // Assessment
+                    2: { cellWidth: 34 },
+                    3: { cellWidth: 58 },
+                    4: { cellWidth: 32 },
+                    5: { cellWidth: 14, halign: 'center' },
+                    6: { cellWidth: 42 },
+                    7: { cellWidth: 50 },
+                    8: { cellWidth: 36 }
                 },
-                didDrawPage: function (data) {
+                didDrawPage: function () {
                     doc.setFontSize(8);
                     doc.text('Dicetak otomatis dari ATP Helper Pro', 14, doc.internal.pageSize.height - 10);
                 }
@@ -138,7 +161,15 @@ const ExportMenu = ({ identity, tpList }) => {
     const handleExportTXT = () => {
         if (isDataEmpty) return;
         let content = `ALUR TUJUAN PEMBELAJARAN (ATP)\n\nNama Guru: ${identity.namaGuru}\nSatuan Pendidikan: ${identity.sekolah}\nMata Pelajaran: ${identity.mapel}\nFase: ${identity.fase}\nKondisi: ${identity.kondisi}\n\nDaftar TP:\n----------\n`;
-        getFormattedData().forEach(item => { content += `[${item.kode}] - ${item.tujuanPembelajaran}\n   Materi: ${item.lingkupMateri} | Waktu: ${item.alokasiWaktu}\n\n`; });
+        getFormattedData().forEach(item => {
+            content += `[${item.kode}] - ${item.tujuanPembelajaran}\n`;
+            content += `   Elemen: ${item.elemen}${item.subElemen ? ` / ${item.subElemen}` : ''}\n`;
+            content += `   Materi: ${item.lingkupMateri} | Waktu: ${item.alokasiWaktu} | Pengalaman: ${item.pengalamanBelajar || '-'}\n`;
+            content += `   KKTP: ${item.kktp}\n`;
+            content += `   Formatif: ${item.asesmenFormatif}\n`;
+            content += `   Sumatif: ${item.asesmenSumatif}\n`;
+            content += `   Alasan Urutan: ${item.alasanUrutan}\n\n`;
+        });
         const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');

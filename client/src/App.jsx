@@ -8,29 +8,27 @@ import MagicBoxInput from './components/MagicBoxInput';
 import ExportMenu from './components/ExportMenu';
 import LandingPage from './components/LandingPage';
 import SecurityCheck from './components/SecurityCheck';
-import { ToggleLeft, ToggleRight, Sparkles } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 
 function App() {
   const [view, setView] = useState('landing');
   const [mode, setMode] = useState('magic'); // 'classic' or 'magic'
-  const [identity, setIdentity] = useState({
-    namaGuru: '',
-    sekolah: '',
-    mapel: '',
-    fase: '',
-    kondisi: 'lengkap'
+  const [identity, setIdentity] = useState(() => {
+    const savedIdentity = localStorage.getItem('atp_identity');
+    return savedIdentity ? JSON.parse(savedIdentity) : {
+      namaGuru: '',
+      sekolah: '',
+      mapel: '',
+      fase: '',
+      kondisi: 'lengkap'
+    };
   });
 
-  const [tpList, setTpList] = useState([]);
-
-  // Load from local storage on mount
-  useEffect(() => {
-    const savedIdentity = localStorage.getItem('atp_identity');
+  const [tpList, setTpList] = useState(() => {
     const savedTpList = localStorage.getItem('atp_list');
-
-    if (savedIdentity) setIdentity(JSON.parse(savedIdentity));
-    if (savedTpList) setTpList(JSON.parse(savedTpList));
-  }, []);
+    return savedTpList ? JSON.parse(savedTpList) : [];
+  });
+  const [analysisResult, setAnalysisResult] = useState(null);
 
   // Save to local storage on change
   useEffect(() => {
@@ -54,38 +52,40 @@ function App() {
   };
 
   // Magic Analysis Handler
-  // Magic Analysis Handler
   const handleMagicAnalysis = (result) => {
+    setAnalysisResult(result);
+
+    if (result.metadata?.fase || result.metadata?.mapel) {
+      setIdentity(prev => ({
+        ...prev,
+        fase: result.metadata?.fase || prev.fase,
+        mapel: result.metadata?.mapel || prev.mapel
+      }));
+    }
+
     // Check if result has the new structure (data_tp) or legacy structure (elemenList)
     if (result.data_tp) {
-      // --- NEW STRUCTURE HANDLER ---
-
-      // Note: We might want to use result.analisis_kurikulum or result.logika_alur somewhere in UI later
-      // For now, we focus on mapping data_tp to our tpList
-
       const newTPs = result.data_tp.map((item, index) => ({
-        id: Date.now() + index, // Generate temporary ID
+        id: Date.now() + index,
         code: item.kode || `${identity.fase || 'X'}.${index + 1}`,
         text: item.tp,
         materi: item.lingkup_materi,
         alokasiWaktu: item.jp,
-        assessment: item.elemen ? `[${item.elemen}] ${item.indikator}` : item.indikator, // Combine Element + Indikator if available
+        assessment: item.kktp || item.indikator,
+        asesmenFormatif: item.asesmen_formatif,
+        asesmenSumatif: item.asesmen_sumatif,
+        alasanUrutan: item.alasan_urutan,
+        pengalamanBelajar: item.pengalaman_belajar,
         level_kognitif: item.level_kognitif,
         elementName: item.elemen || 'Umum',
-        kko: "", // New prompt doesn't strictly separate KKO in JSON, so we leave blank or try to extract from text if needed. 
-        // Actually, prompt asks for "Rumusan TP". 
-        // If we want KKO highlighting, we'd need to parse it or ask AI to separate it. 
-        // For now, let's leave KKO blank to avoid errors.
+        subElementName: item.sub_elemen || '',
+        kompetensi: item.kompetensi || '',
+        konten: item.konten || '',
+        kko: item.kompetensi || '',
         dateCreated: Date.now()
       }));
 
       setTpList(newTPs);
-
-      // Attempt to update identity if common fields are detected (though specific prompt might not return them in root)
-      // The prompt asks to extract Phase/Element but doesn't explicitly put them in root JSON keys except "fase" in old prompt.
-      // New prompt output schema doesn't have root "fase" or "mataPelajaran".
-      // We rely on what users put in IdentityForm or what MagicBoxInput detected locally.
-
     } else {
       // --- LEGACY/OFFLINE STRUCTURE HANDLER ---
 
@@ -140,13 +140,11 @@ function App() {
     setTpList(reindexedList);
   };
 
-  const handleUpdateTP = (id, newValues) => {
-    // If object is passed (mass update) or field/value pair
+  const handleUpdateTP = (id, newValues, value) => {
     if (typeof newValues === 'object') {
       setTpList(prev => prev.map(item => item.id === id ? { ...item, ...newValues } : item));
     } else {
-      // Fallback for old calls (field, value) - though not used in Pro Table
-      setTpList(prev => prev.map(item => item.id === id ? { ...item, [arguments[1]]: arguments[2] } : item));
+      setTpList(prev => prev.map(item => item.id === id ? { ...item, [newValues]: value } : item));
     }
   };
 
@@ -204,7 +202,7 @@ function App() {
                 {mode === 'classic' ? (
                   <CPAnalysis onAddTP={handleAddTP} kondisi={identity.kondisi} />
                 ) : (
-                  <MagicBoxInput onAnalyze={handleMagicAnalysis} />
+                  <MagicBoxInput onAnalyze={handleMagicAnalysis} identity={identity} />
                 )}
               </div>
 
@@ -223,11 +221,42 @@ function App() {
                   </div>
 
                   {mode === 'magic' && tpList.length > 0 ? (
-                    <ATPTableProfessional
-                      data={tpList}
-                      onUpdateTP={handleUpdateTP}
-                      onDeleteTP={handleDeleteTP}
-                    />
+                    <>
+                      {analysisResult && (
+                        <div className="px-6 py-4 border-b border-slate-100 bg-white">
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
+                            <div className="rounded-lg border border-indigo-100 bg-indigo-50 p-3">
+                              <p className="text-[10px] font-bold uppercase tracking-wide text-indigo-500">Analisis CP</p>
+                              <p className="mt-1 text-xs text-indigo-950 leading-relaxed">{analysisResult.analisis_kurikulum}</p>
+                            </div>
+                            <div className="rounded-lg border border-emerald-100 bg-emerald-50 p-3">
+                              <p className="text-[10px] font-bold uppercase tracking-wide text-emerald-600">Logika ATP</p>
+                              <p className="mt-1 text-xs text-emerald-950 leading-relaxed">{analysisResult.logika_alur || 'Urutan TP disusun dari prasyarat menuju penerapan dan refleksi.'}</p>
+                            </div>
+                            <div className="rounded-lg border border-amber-100 bg-amber-50 p-3">
+                              <p className="text-[10px] font-bold uppercase tracking-wide text-amber-600">Validasi Guru</p>
+                              <p className="mt-1 text-xs text-amber-950 leading-relaxed">
+                                {(analysisResult.catatan_validasi || []).slice(0, 2).join(' ') || 'Sesuaikan JP, konteks kelas, dan KKTP dengan kondisi satuan pendidikan.'}
+                              </p>
+                            </div>
+                          </div>
+                          {analysisResult.analisis_cp?.length > 0 && (
+                            <div className="flex flex-wrap gap-2">
+                              {analysisResult.analisis_cp.map((item, index) => (
+                                <span key={`${item.elemen}-${index}`} className="inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-[11px] font-semibold text-slate-600">
+                                  {item.elemen || 'Umum'}{item.sub_elemen ? ` / ${item.sub_elemen}` : ''}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                      <ATPTableProfessional
+                        data={tpList}
+                        onUpdateTP={handleUpdateTP}
+                        onDeleteTP={handleDeleteTP}
+                      />
+                    </>
                   ) : (
                     <ATPDraggableList
                       items={tpList}

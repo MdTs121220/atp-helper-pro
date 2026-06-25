@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Edit2, Save, Trash2, CheckCircle, GripVertical } from 'lucide-react';
+import { Edit2, Save, Trash2, CheckCircle, ClipboardCheck, Route } from 'lucide-react';
 
 const ATPTableProfessional = ({ data, onUpdateTP, onDeleteTP }) => {
     const [editingId, setEditingId] = useState(null);
@@ -32,7 +32,9 @@ const ATPTableProfessional = ({ data, onUpdateTP, onDeleteTP }) => {
                         <th className="px-4 py-3 min-w-[320px] font-semibold border-b-2 border-slate-200">Tujuan Pembelajaran (TP)</th>
                         <th className="px-4 py-3 w-48 font-semibold border-b-2 border-slate-200">Lingkup Materi</th>
                         <th className="px-4 py-3 w-20 text-center font-semibold border-b-2 border-slate-200">JP</th>
-                        <th className="px-4 py-3 w-48 font-semibold border-b-2 border-slate-200">Indikator Asesmen</th>
+                        <th className="px-4 py-3 w-56 font-semibold border-b-2 border-slate-200">KKTP</th>
+                        <th className="px-4 py-3 w-56 font-semibold border-b-2 border-slate-200">Asesmen</th>
+                        <th className="px-4 py-3 w-56 font-semibold border-b-2 border-slate-200">Alasan Urutan</th>
                         <th className="px-4 py-3 w-20 text-center font-semibold border-b-2 border-slate-200">Aksi</th>
                     </tr>
                 </thead>
@@ -77,6 +79,16 @@ const ATPTableProfessional = ({ data, onUpdateTP, onDeleteTP }) => {
                                             <span className="inline-flex items-center text-[10px] uppercase font-bold text-slate-500 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded-full">
                                                 {item.elementName || "Umum"}
                                             </span>
+                                            {item.subElementName && (
+                                                <span className="ml-1 inline-flex items-center text-[10px] uppercase font-bold text-indigo-500 bg-indigo-50 border border-indigo-100 px-2 py-0.5 rounded-full">
+                                                    {item.subElementName}
+                                                </span>
+                                            )}
+                                            {item.pengalamanBelajar && (
+                                                <span className="ml-1 inline-flex items-center text-[10px] uppercase font-bold text-purple-500 bg-purple-50 border border-purple-100 px-2 py-0.5 rounded-full">
+                                                    {item.pengalamanBelajar}
+                                                </span>
+                                            )}
                                         </div>
                                     </div>
                                 )}
@@ -126,6 +138,56 @@ const ATPTableProfessional = ({ data, onUpdateTP, onDeleteTP }) => {
                                     <div className="flex items-start text-xs text-slate-600 bg-emerald-50/50 p-2 rounded-lg border border-emerald-100">
                                         <CheckCircle size={14} className="text-emerald-600 mr-2 mt-0.5 flex-shrink-0" />
                                         <span className="leading-relaxed whitespace-pre-wrap text-emerald-900 font-medium">{item.assessment || '-'}</span>
+                                    </div>
+                                )}
+                            </td>
+
+                            {/* Asesmen */}
+                            <td className="px-4 py-4 align-top">
+                                {editingId === item.id ? (
+                                    <div className="space-y-2">
+                                        <textarea
+                                            className="w-full p-2 border border-indigo-300 rounded text-xs"
+                                            rows={3}
+                                            value={editValues.asesmenFormatif || ''}
+                                            onChange={(e) => handleChange('asesmenFormatif', e.target.value)}
+                                            placeholder="Asesmen formatif"
+                                        />
+                                        <textarea
+                                            className="w-full p-2 border border-indigo-300 rounded text-xs"
+                                            rows={3}
+                                            value={editValues.asesmenSumatif || ''}
+                                            onChange={(e) => handleChange('asesmenSumatif', e.target.value)}
+                                            placeholder="Asesmen sumatif"
+                                        />
+                                    </div>
+                                ) : (
+                                    <div className="space-y-2 text-xs">
+                                        <div className="flex items-start rounded-lg border border-blue-100 bg-blue-50 p-2 text-blue-950">
+                                            <ClipboardCheck size={14} className="mr-2 mt-0.5 flex-shrink-0 text-blue-600" />
+                                            <span><strong>Formatif:</strong> {item.asesmenFormatif || '-'}</span>
+                                        </div>
+                                        <div className="flex items-start rounded-lg border border-violet-100 bg-violet-50 p-2 text-violet-950">
+                                            <ClipboardCheck size={14} className="mr-2 mt-0.5 flex-shrink-0 text-violet-600" />
+                                            <span><strong>Sumatif:</strong> {item.asesmenSumatif || '-'}</span>
+                                        </div>
+                                    </div>
+                                )}
+                            </td>
+
+                            {/* Alasan Urutan */}
+                            <td className="px-4 py-4 align-top">
+                                {editingId === item.id ? (
+                                    <textarea
+                                        className="w-full p-2 border border-indigo-300 rounded text-xs"
+                                        rows={4}
+                                        value={editValues.alasanUrutan || ''}
+                                        onChange={(e) => handleChange('alasanUrutan', e.target.value)}
+                                    />
+                                ) : (
+                                    <div className="flex items-start text-xs text-slate-700 bg-slate-50 p-2 rounded-lg border border-slate-200">
+                                        <Route size={14} className="text-slate-500 mr-2 mt-0.5 flex-shrink-0" />
+                                        <span className="leading-relaxed whitespace-pre-wrap">{item.alasanUrutan || item.level_kognitif || '-'}</span>
                                     </div>
                                 )}
                             </td>
