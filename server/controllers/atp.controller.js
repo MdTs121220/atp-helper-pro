@@ -148,6 +148,15 @@ const buildOfflineDraft = (text, identity = {}) => {
     };
 };
 
+const normalizeCode = (code, fase, index) => {
+    const fallbackPrefix = fase || 'Fase';
+    if (!code) return `${fallbackPrefix}.${index + 1}`;
+    if (!fase) return code;
+
+    const normalized = String(code).trim();
+    return normalized.replace(/^[A-F](?=[.\-\s]?\d)/i, fase);
+};
+
 const normalizeResult = (json, originalText, identity = {}) => {
     if (!json || !Array.isArray(json.data_tp)) {
         throw new Error('Struktur AI tidak valid: data_tp wajib berupa array.');
@@ -160,7 +169,7 @@ const normalizeResult = (json, originalText, identity = {}) => {
         analisis_kurikulum: json.analisis_kurikulum || 'Analisis CP dan penyusunan TP/ATP berdasarkan Panduan Pembelajaran dan Asesmen 2025.',
         analisis_cp: Array.isArray(json.analisis_cp) ? json.analisis_cp : [],
         data_tp: json.data_tp.map((item, index) => ({
-            kode: item.kode || `${metadata.fase || 'Fase'}.${index + 1}`,
+            kode: normalizeCode(item.kode, metadata.fase, index),
             tp: item.tp || item.tujuan_pembelajaran || '',
             elemen: item.elemen || 'Umum',
             sub_elemen: item.sub_elemen || item.subElemen || '',
