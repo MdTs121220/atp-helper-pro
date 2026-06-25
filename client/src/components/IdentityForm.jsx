@@ -16,14 +16,14 @@ const IdentityForm = ({ data, onChange }) => {
     const labelColor = isTerbatas ? 'peer-focus:text-amber-600' : 'peer-focus:text-indigo-600';
 
     return (
-        <div className="glass-panel p-6 animate-slide-up">
-            <div className="flex items-center space-x-3 mb-6 border-b border-slate-100 pb-4">
-                <div className={`p-2 rounded-lg ${isTerbatas ? 'bg-amber-100 text-amber-600' : 'bg-indigo-100 text-indigo-600'}`}>
+        <div className="animate-slide-up rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+            <div className="mb-5 flex items-center space-x-3 border-b border-slate-100 pb-4">
+                <div className={`rounded-lg p-2 ${isTerbatas ? 'bg-amber-100 text-amber-600' : 'bg-slate-950 text-cyan-300'}`}>
                     <Users size={20} />
                 </div>
                 <div>
-                    <h2 className="text-lg font-bold text-slate-800">Identitas Sekolah</h2>
-                    <p className="text-xs text-slate-500">Lengkapi data untuk kop perangkat ajar.</p>
+                    <h2 className="text-lg font-black text-slate-900">Identitas Perangkat</h2>
+                    <p className="text-xs text-slate-500">Dipakai untuk metadata ATP dan export.</p>
                 </div>
             </div>
 
@@ -102,10 +102,10 @@ const IdentityForm = ({ data, onChange }) => {
                 </div>
 
                 {/* iOS Style Toggle for Sarpras */}
-                <div className={`mt-6 p-4 rounded-xl border transition-all duration-300 ${isTerbatas ? 'bg-amber-50 border-amber-200' : 'bg-slate-50 border-slate-200'}`}>
+                <div className={`mt-6 rounded-lg border p-4 transition-all duration-300 ${isTerbatas ? 'bg-amber-50 border-amber-200' : 'bg-slate-50 border-slate-200'}`}>
                     <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-3">
-                            <div className={`p-1.5 rounded-full ${isTerbatas ? 'bg-amber-200 text-amber-700' : 'bg-slate-200 text-slate-600'}`}>
+                            <div className={`rounded-md p-1.5 ${isTerbatas ? 'bg-amber-200 text-amber-700' : 'bg-slate-200 text-slate-600'}`}>
                                 {isTerbatas ? <Zap size={16} /> : <School size={16} />}
                             </div>
                             <div>

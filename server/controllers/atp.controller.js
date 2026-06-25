@@ -186,8 +186,115 @@ const normalizeResult = (json, originalText, identity = {}) => {
         })).filter((item) => item.tp),
         logika_alur: json.logika_alur || '',
         catatan_validasi: Array.isArray(json.catatan_validasi) ? json.catatan_validasi : [],
-        mode: json.mode || 'ai'
+        mode: json.mode || 'ai',
+        engine: json.engine || undefined
     };
+};
+
+const getEngineConfig = (override = {}) => {
+    const provider = override.provider || process.env.AI_PROVIDER || (
+        process.env.NVIDIA_API_KEY || process.env.OPENAI_COMPATIBLE_API_KEY ? 'openai-compatible' : 'gemini'
+    );
+
+    if (provider === 'openai-compatible' || provider === 'nvidia') {
+        return {
+            provider: 'openai-compatible',
+            label: 'NVIDIA / OpenAI Compatible',
+            apiKey: override.apiKey || process.env.NVIDIA_API_KEY || process.env.OPENAI_COMPATIBLE_API_KEY || '',
+            baseUrl: (override.baseUrl || process.env.NVIDIA_BASE_URL || process.env.OPENAI_COMPATIBLE_BASE_URL || 'https://integrate.api.nvidia.com/v1').replace(/\/$/, ''),
+            model: override.model || process.env.NVIDIA_MODEL || process.env.OPENAI_COMPATIBLE_MODEL || 'minimaxai/minimax-m3'
+        };
+    }
+
+    return {
+        provider: 'gemini',
+        label: 'Google Gemini',
+        apiKey: override.apiKey || process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY || '',
+        model: override.model || process.env.GEMINI_MODEL || ''
+    };
+};
+
+const callOpenAICompatible = async ({ prompt, config, maxTokens = 8192 }) => {
+    if (!config.apiKey) throw new Error('API key OpenAI-compatible/NVIDIA belum diisi.');
+
+    const response = await fetch(`${config.baseUrl}/chat/completions`, {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${config.apiKey}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            model: config.model,
+            messages: [
+                {
+                    role: 'system',
+                    content: 'Anda adalah asisten kurikulum Indonesia. Jawab hanya JSON valid ketika diminta.'
+                },
+                { role: 'user', content: prompt }
+            ],
+            temperature: 0.25,
+            top_p: 0.9,
+            max_tokens: maxTokens
+        })
+    });
+
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok) {
+        const message = payload?.error?.message || payload?.message || `HTTP ${response.status}`;
+        throw new Error(message);
+    }
+
+    const content = payload?.choices?.[0]?.message?.content;
+    if (!content) throw new Error('Respons AI kosong atau tidak memakai format chat completions.');
+    return content;
+};
+
+const callGemini = async ({ prompt, config }) => {
+    if (!config.apiKey) throw new Error('API key Gemini belum diisi.');
+
+    const models = config.model ? [config.model] : [
+        'gemini-2.5-flash',
+        'gemini-2.0-flash',
+        'gemini-2.0-flash-lite',
+        'gemini-flash-latest',
+        'gemini-pro-latest'
+    ];
+
+    const genAI = new GoogleGenerativeAI(config.apiKey);
+    let lastError;
+
+    for (const modelName of models) {
+        try {
+            console.log(`Trying Gemini model: ${modelName}...`);
+            const model = genAI.getGenerativeModel({
+                model: modelName,
+                generationConfig: {
+                    temperature: 0.35,
+                    topP: 0.9,
+                    maxOutputTokens: 8192
+                }
+            });
+
+            const result = await model.generateContent(prompt);
+            const response = await result.response;
+            return { text: response.text(), model: modelName };
+        } catch (err) {
+            lastError = err;
+            console.error(`Gemini model ${modelName} failed:`, err.message);
+        }
+    }
+
+    throw lastError || new Error('Semua model Gemini gagal.');
+};
+
+const runAiGeneration = async ({ prompt, config }) => {
+    if (config.provider === 'openai-compatible') {
+        const text = await callOpenAICompatible({ prompt, config });
+        return { text, engine: { provider: config.provider, model: config.model, baseUrl: config.baseUrl } };
+    }
+
+    const result = await callGemini({ prompt, config });
+    return { text: result.text, engine: { provider: 'gemini', model: result.model } };
 };
 
 const buildPrompt = (text, identity = {}) => {
@@ -278,52 +385,87 @@ KEMBALIKAN JSON MURNI SAJA, tanpa markdown:
 
 export const generateATP = async (req, res) => {
     try {
-        const { text, identity = {} } = req.body;
+        const { text, identity = {}, aiConfig = null } = req.body;
         if (!text || !text.trim()) {
             return res.status(400).json({ error: 'Teks CP tidak boleh kosong.' });
         }
 
-        const apiKey = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY;
+        const config = getEngineConfig(aiConfig || {});
+        const prompt = buildPrompt(text, identity);
 
-        if (apiKey) {
-            const models = [
-                'gemini-2.5-flash',
-                'gemini-2.0-flash',
-                'gemini-2.0-flash-lite',
-                'gemini-flash-latest',
-                'gemini-pro-latest'
-            ];
-
-            const prompt = buildPrompt(text, identity);
-            const genAI = new GoogleGenerativeAI(apiKey);
-
-            for (const modelName of models) {
-                try {
-                    console.log(`Trying Gemini model: ${modelName}...`);
-                    const model = genAI.getGenerativeModel({
-                        model: modelName,
-                        generationConfig: {
-                            temperature: 0.35,
-                            topP: 0.9,
-                            maxOutputTokens: 8192
-                        }
-                    });
-
-                    const result = await model.generateContent(prompt);
-                    const response = await result.response;
-                    const rawText = response.text();
-                    const parsed = JSON.parse(cleanJsonText(rawText));
-                    return res.json(normalizeResult(parsed, text, identity));
-                } catch (err) {
-                    console.error(`Gemini model ${modelName} failed:`, err.message);
-                }
+        if (config.apiKey) {
+            try {
+                const aiResponse = await runAiGeneration({ prompt, config });
+                const parsed = JSON.parse(cleanJsonText(aiResponse.text));
+                const normalized = normalizeResult(parsed, text, identity);
+                return res.json({
+                    ...normalized,
+                    engine: aiResponse.engine
+                });
+            } catch (err) {
+                console.error(`${config.label} failed:`, err.message);
             }
         }
 
-        console.log('Gemini unavailable. Returning CP-based offline draft.');
+        console.log('AI unavailable. Returning CP-based offline draft.');
         return res.json(buildOfflineDraft(text, identity));
     } catch (error) {
         console.error('Fatal Controller Error:', error);
         res.status(500).json({ error: 'Internal Server Error', details: error.message });
     }
+};
+
+export const testAIEngine = async (req, res) => {
+    try {
+        const config = getEngineConfig(req.body || {});
+        if (!config.apiKey) {
+            return res.status(400).json({
+                ok: false,
+                error: `API key untuk ${config.label} belum diisi.`
+            });
+        }
+
+        const prompt = 'Balas JSON murni saja: {"ok":true,"message":"AI engine aktif"}';
+        const aiResponse = await runAiGeneration({ prompt, config });
+        const cleaned = cleanJsonText(aiResponse.text);
+        let parsed;
+
+        try {
+            parsed = JSON.parse(cleaned);
+        } catch {
+            parsed = { ok: true, message: cleaned.slice(0, 240) };
+        }
+
+        return res.json({
+            ok: true,
+            provider: aiResponse.engine.provider,
+            model: aiResponse.engine.model,
+            baseUrl: aiResponse.engine.baseUrl,
+            sample: parsed
+        });
+    } catch (error) {
+        console.error('AI test failed:', error.message);
+        res.status(500).json({
+            ok: false,
+            error: error.message
+        });
+    }
+};
+
+export const adminLogin = async (req, res) => {
+    const configuredPassword = process.env.ADMIN_PASSWORD || process.env.APP_ADMIN_PASSWORD || 'atphelper-admin';
+    const usingDefault = !process.env.ADMIN_PASSWORD && !process.env.APP_ADMIN_PASSWORD;
+    const { password } = req.body || {};
+
+    if (password !== configuredPassword) {
+        return res.status(401).json({ ok: false, error: 'Password admin salah.' });
+    }
+
+    return res.json({
+        ok: true,
+        usingDefault,
+        message: usingDefault
+            ? 'Login berhasil. Untuk production, set env ADMIN_PASSWORD di Vercel.'
+            : 'Login admin berhasil.'
+    });
 };

@@ -8,6 +8,7 @@ import MagicBoxInput from './components/MagicBoxInput';
 import ExportMenu from './components/ExportMenu';
 import LandingPage from './components/LandingPage';
 import SecurityCheck from './components/SecurityCheck';
+import AdminAISettings from './components/AdminAISettings';
 import { Sparkles } from 'lucide-react';
 
 function App() {
@@ -29,6 +30,11 @@ function App() {
     return savedTpList ? JSON.parse(savedTpList) : [];
   });
   const [analysisResult, setAnalysisResult] = useState(null);
+  const [aiConfig, setAiConfig] = useState(() => {
+    const hasAdminSession = localStorage.getItem('atp_ai_admin_session') === 'true';
+    const saved = localStorage.getItem('atp_ai_admin_config');
+    return hasAdminSession && saved ? JSON.parse(saved) : null;
+  });
 
   // Save to local storage on change
   useEffect(() => {
@@ -165,30 +171,33 @@ function App() {
           <div className="animate-fade-in pb-24 relative">
 
             {/* Dashboard Header */}
-            <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between border-b border-slate-200 pb-6">
+            <div className="mb-6 flex flex-col gap-5 rounded-lg border border-slate-200 bg-white p-5 shadow-sm md:flex-row md:items-center md:justify-between">
               <div>
-                <h2 className="text-3xl font-extrabold text-slate-800 tracking-tight leading-tight">
-                  Penyusunan ATP
+                <p className="text-xs font-black uppercase tracking-[0.2em] text-cyan-700">
+                  Workspace Guru
+                </p>
+                <h2 className="mt-1 text-2xl font-black tracking-tight text-slate-950 md:text-3xl">
+                  Penyusunan TP dan ATP
                 </h2>
-                <p className="text-slate-500 mt-1">
-                  Asisten Cerdas Penyusunan Alur Tujuan Pembelajaran.
+                <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
+                  Ikuti alur PPA 2025: analisis CP, turunkan TP, susun ATP, lalu validasi KKTP dan asesmen.
                 </p>
               </div>
 
               {/* Mode Switcher */}
-              <div className="mt-4 md:mt-0 flex items-center space-x-3 bg-slate-100 p-1 rounded-full">
+              <div className="flex items-center gap-1 rounded-lg border border-slate-200 bg-slate-50 p-1">
                 <button
                   onClick={() => setMode('classic')}
-                  className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${mode === 'classic' ? 'bg-white shadow text-slate-800' : 'text-slate-500 hover:text-slate-700'}`}
+                  className={`rounded-md px-4 py-2 text-xs font-bold transition-all ${mode === 'classic' ? 'bg-white text-slate-950 shadow-sm' : 'text-slate-500 hover:text-slate-800'}`}
                 >
                   Manual / Klasik
                 </button>
                 <button
                   onClick={() => setMode('magic')}
-                  className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all flex items-center ${mode === 'magic' ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow' : 'text-slate-500 hover:text-slate-700'}`}
+                  className={`flex items-center rounded-md px-4 py-2 text-xs font-bold transition-all ${mode === 'magic' ? 'bg-slate-950 text-white shadow-sm' : 'text-slate-500 hover:text-slate-800'}`}
                 >
                   <Sparkles size={12} className="mr-1" />
-                  Magic Assistant
+                  AI Assistant
                 </button>
               </div>
             </div>
@@ -202,21 +211,24 @@ function App() {
                 {mode === 'classic' ? (
                   <CPAnalysis onAddTP={handleAddTP} kondisi={identity.kondisi} />
                 ) : (
-                  <MagicBoxInput onAnalyze={handleMagicAnalysis} identity={identity} />
+                  <MagicBoxInput onAnalyze={handleMagicAnalysis} identity={identity} aiConfig={aiConfig} />
                 )}
               </div>
 
               {/* RIGHT COLUMN: Result Preview */}
               <div className="lg:col-span-8 space-y-6">
-                <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden min-h-[600px]">
-                  <div className="px-6 py-4 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
-                    <h3 className="font-bold text-slate-700">
+                <div className="min-h-[600px] overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
+                  <div className="flex items-center justify-between border-b border-slate-200 bg-white px-5 py-4">
+                    <h3 className="font-black text-slate-800">
                       {mode === 'magic' ? 'Hasil Analisis AI & Preview ATP' : 'Draf Alur Tujuan Pembelajaran'}
                     </h3>
-                    <div className="flex space-x-2">
-                      <span className="w-3 h-3 rounded-full bg-slate-300"></span>
-                      <span className="w-3 h-3 rounded-full bg-slate-300"></span>
-                      <span className="w-3 h-3 rounded-full bg-slate-300"></span>
+                    <div className="flex items-center gap-3">
+                      {aiConfig && (
+                        <span className="hidden rounded-full bg-emerald-50 px-3 py-1 text-[11px] font-bold text-emerald-700 md:inline-flex">
+                          AI Override Aktif
+                        </span>
+                      )}
+                      <AdminAISettings onConfigChange={setAiConfig} />
                     </div>
                   </div>
 
@@ -225,8 +237,8 @@ function App() {
                       {analysisResult && (
                         <div className="px-6 py-4 border-b border-slate-100 bg-white">
                           <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
-                            <div className="rounded-lg border border-indigo-100 bg-indigo-50 p-3">
-                              <p className="text-[10px] font-bold uppercase tracking-wide text-indigo-500">Analisis CP</p>
+                            <div className="rounded-lg border border-cyan-100 bg-cyan-50 p-3">
+                              <p className="text-[10px] font-bold uppercase tracking-wide text-cyan-700">Analisis CP</p>
                               <p className="mt-1 text-xs text-indigo-950 leading-relaxed">{analysisResult.analisis_kurikulum}</p>
                             </div>
                             <div className="rounded-lg border border-emerald-100 bg-emerald-50 p-3">
@@ -234,7 +246,9 @@ function App() {
                               <p className="mt-1 text-xs text-emerald-950 leading-relaxed">{analysisResult.logika_alur || 'Urutan TP disusun dari prasyarat menuju penerapan dan refleksi.'}</p>
                             </div>
                             <div className="rounded-lg border border-amber-100 bg-amber-50 p-3">
-                              <p className="text-[10px] font-bold uppercase tracking-wide text-amber-600">Validasi Guru</p>
+                              <p className="text-[10px] font-bold uppercase tracking-wide text-amber-600">
+                                {analysisResult.engine ? `Engine: ${analysisResult.engine.model}` : 'Validasi Guru'}
+                              </p>
                               <p className="mt-1 text-xs text-amber-950 leading-relaxed">
                                 {(analysisResult.catatan_validasi || []).slice(0, 2).join(' ') || 'Sesuaikan JP, konteks kelas, dan KKTP dengan kondisi satuan pendidikan.'}
                               </p>

@@ -38,10 +38,10 @@ const CPAnalysis = ({ onAddTP, kondisi }) => {
     };
 
     return (
-        <div className="glass-card rounded-3xl overflow-hidden animate-slide-up" style={{ animationDelay: '0.2s' }}>
-            <div className="bg-gradient-to-r from-white to-teal-50 px-6 py-4 border-b border-teal-100/50 flex items-center justify-between">
+        <div className="animate-slide-up overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm" style={{ animationDelay: '0.2s' }}>
+            <div className="flex items-center justify-between border-b border-slate-100 bg-white px-5 py-4">
                 <h2 className="text-lg font-bold text-slate-800 flex items-center">
-                    <div className="bg-teal-100 p-2 rounded-lg mr-3 shadow-sm text-teal-600">
+                    <div className="mr-3 rounded-lg bg-slate-950 p-2 text-cyan-300 shadow-sm">
                         <Split size={20} />
                     </div>
                     Analisis Capaian Pembelajaran
@@ -65,7 +65,7 @@ const CPAnalysis = ({ onAddTP, kondisi }) => {
                     {!splitMode && (
                         <button
                             onClick={() => setSplitMode(true)}
-                            className="w-full btn-secondary py-3 rounded-xl flex items-center justify-center font-bold text-sm"
+                    className="flex w-full items-center justify-center rounded-lg border border-slate-200 bg-white py-3 text-sm font-bold text-slate-700 hover:bg-slate-50"
                         >
                             <ArrowDown size={18} className="mr-2" />
                             Mulai Breakdown & Analisis
@@ -76,7 +76,7 @@ const CPAnalysis = ({ onAddTP, kondisi }) => {
                 {splitMode && (
                     <div className="space-y-6 animate-fade-in relative">
 
-                        <div className="bg-teal-50/50 p-5 rounded-2xl border border-teal-100 hover:border-teal-200 transition-all group relative">
+                        <div className="group relative rounded-lg border border-slate-200 bg-slate-50 p-5 transition-all hover:border-cyan-200">
                             <label className="block text-xs font-bold text-teal-700 uppercase tracking-wider mb-2 flex items-center">
                                 <span className="w-2 rounded-full h-2 bg-teal-500 mr-2"></span>
                                 Kompetensi (Kata Kerja)
@@ -100,7 +100,7 @@ const CPAnalysis = ({ onAddTP, kondisi }) => {
                             </p>
                         </div>
 
-                        <div className="bg-indigo-50/50 p-5 rounded-2xl border border-indigo-100 hover:border-indigo-200 transition-all group">
+                        <div className="group rounded-lg border border-slate-200 bg-slate-50 p-5 transition-all hover:border-cyan-200">
                             <label className="block text-xs font-bold text-indigo-700 uppercase tracking-wider mb-2 flex items-center">
                                 <span className="w-2 rounded-full h-2 bg-indigo-500 mr-2"></span>
                                 Lingkup Materi
@@ -120,7 +120,7 @@ const CPAnalysis = ({ onAddTP, kondisi }) => {
                         <button
                             onClick={handleGenerate}
                             disabled={!competency || !material}
-                            className="w-full btn-primary py-3.5 rounded-xl flex items-center justify-center font-bold text-base disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none group"
+                            className="group flex w-full items-center justify-center rounded-lg bg-slate-950 py-3.5 text-base font-bold text-white disabled:cursor-not-allowed disabled:bg-slate-300 disabled:shadow-none"
                         >
                             <Sparkles size={18} className="mr-2 group-hover:scale-110 transition-transform" />
                             Generate ke Tabel ATP

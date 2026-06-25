@@ -23,7 +23,7 @@ const ATPTableProfessional = ({ data, onUpdateTP, onDeleteTP }) => {
     };
 
     return (
-        <div className="overflow-x-auto rounded-tl-xl rounded-bl-xl shadow-sm border border-slate-200">
+        <div className="overflow-x-auto border-t border-slate-200">
             <table className="w-full text-sm text-left text-slate-600 bg-white">
                 <thead className="text-xs text-slate-500 uppercase bg-slate-50 border-b border-slate-200 sticky top-0 z-10">
                     <tr>
@@ -104,7 +104,7 @@ const ATPTableProfessional = ({ data, onUpdateTP, onDeleteTP }) => {
                                         onChange={(e) => handleChange('materi', e.target.value)}
                                     />
                                 ) : (
-                                    <div className="bg-orange-50 text-orange-800 p-2 rounded-lg border border-orange-100 text-xs font-medium leading-relaxed whitespace-pre-wrap">
+                                    <div className="rounded-md border border-amber-100 bg-amber-50 p-2 text-xs font-medium leading-relaxed text-amber-900 whitespace-pre-wrap">
                                         {item.materi || '-'}
                                     </div>
                                 )}
@@ -135,7 +135,7 @@ const ATPTableProfessional = ({ data, onUpdateTP, onDeleteTP }) => {
                                         onChange={(e) => handleChange('assessment', e.target.value)}
                                     />
                                 ) : (
-                                    <div className="flex items-start text-xs text-slate-600 bg-emerald-50/50 p-2 rounded-lg border border-emerald-100">
+                                    <div className="flex items-start rounded-md border border-emerald-100 bg-emerald-50/50 p-2 text-xs text-slate-600">
                                         <CheckCircle size={14} className="text-emerald-600 mr-2 mt-0.5 flex-shrink-0" />
                                         <span className="leading-relaxed whitespace-pre-wrap text-emerald-900 font-medium">{item.assessment || '-'}</span>
                                     </div>
@@ -163,11 +163,11 @@ const ATPTableProfessional = ({ data, onUpdateTP, onDeleteTP }) => {
                                     </div>
                                 ) : (
                                     <div className="space-y-2 text-xs">
-                                        <div className="flex items-start rounded-lg border border-blue-100 bg-blue-50 p-2 text-blue-950">
+                                        <div className="flex items-start rounded-md border border-blue-100 bg-blue-50 p-2 text-blue-950">
                                             <ClipboardCheck size={14} className="mr-2 mt-0.5 flex-shrink-0 text-blue-600" />
                                             <span><strong>Formatif:</strong> {item.asesmenFormatif || '-'}</span>
                                         </div>
-                                        <div className="flex items-start rounded-lg border border-violet-100 bg-violet-50 p-2 text-violet-950">
+                                        <div className="flex items-start rounded-md border border-violet-100 bg-violet-50 p-2 text-violet-950">
                                             <ClipboardCheck size={14} className="mr-2 mt-0.5 flex-shrink-0 text-violet-600" />
                                             <span><strong>Sumatif:</strong> {item.asesmenSumatif || '-'}</span>
                                         </div>
@@ -185,7 +185,7 @@ const ATPTableProfessional = ({ data, onUpdateTP, onDeleteTP }) => {
                                         onChange={(e) => handleChange('alasanUrutan', e.target.value)}
                                     />
                                 ) : (
-                                    <div className="flex items-start text-xs text-slate-700 bg-slate-50 p-2 rounded-lg border border-slate-200">
+                                    <div className="flex items-start rounded-md border border-slate-200 bg-slate-50 p-2 text-xs text-slate-700">
                                         <Route size={14} className="text-slate-500 mr-2 mt-0.5 flex-shrink-0" />
                                         <span className="leading-relaxed whitespace-pre-wrap">{item.alasanUrutan || item.level_kognitif || '-'}</span>
                                     </div>

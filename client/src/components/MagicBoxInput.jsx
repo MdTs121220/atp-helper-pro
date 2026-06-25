@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Wand2, Loader2, FileText, CheckCircle2, AlertCircle, RotateCcw } from 'lucide-react'; // Added RotateCcw
 import { smartParser } from '../utils/smartParser';
 
-const MagicBoxInput = ({ onAnalyze, identity }) => {
+const MagicBoxInput = ({ onAnalyze, identity, aiConfig }) => {
     const [text, setText] = useState('');
     const [isAnalyzing, setIsAnalyzing] = useState(false);
     const [detectedData, setDetectedData] = useState(null);
@@ -45,7 +45,7 @@ const MagicBoxInput = ({ onAnalyze, identity }) => {
             const response = await fetch('/api/atp/generate', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ text, identity })
+                body: JSON.stringify({ text, identity, aiConfig })
             });
 
             const data = await response.json();
@@ -66,18 +66,16 @@ const MagicBoxInput = ({ onAnalyze, identity }) => {
     };
 
     return (
-        <div className="glass-panel p-1 relative overflow-hidden group">
-            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 opacity-50"></div>
-
-            <div className="bg-white/50 p-6 rounded-xl backdrop-blur-sm relative z-10">
+        <div className="rounded-lg border border-slate-200 bg-white shadow-sm">
+            <div className="relative z-10 p-5">
                 <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center space-x-2">
-                        <div className="p-2 bg-indigo-100 text-indigo-600 rounded-lg">
+                        <div className="rounded-lg bg-slate-950 p-2 text-cyan-300">
                             <Wand2 size={24} />
                         </div>
                         <div>
-                            <h3 className="text-xl font-bold text-slate-800">AI Penyusun TP & ATP</h3>
-                            <p className="text-xs text-slate-500">Tempel CP lengkap, termasuk elemen dan sub-elemen bila ada.</p>
+                            <h3 className="text-lg font-black text-slate-900">AI Penyusun TP & ATP</h3>
+                            <p className="text-xs text-slate-500">Input wajib: fase, mapel, elemen/sub-elemen, dan isi CP.</p>
                         </div>
                     </div>
                     {detectedData && (
@@ -100,7 +98,7 @@ const MagicBoxInput = ({ onAnalyze, identity }) => {
                     <textarea
                         value={text}
                         onChange={handleTextChange}
-                        className={`w-full h-48 p-4 text-sm text-slate-700 bg-slate-50 border rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all resize-none shadow-inner ${error ? 'border-red-300 bg-red-50' : 'border-slate-200'}`}
+                        className={`h-56 w-full resize-none rounded-lg border bg-slate-50 p-4 text-sm leading-6 text-slate-700 shadow-inner transition-all focus:border-cyan-500 focus:ring-2 focus:ring-cyan-100 ${error ? 'border-red-300 bg-red-50' : 'border-slate-200'}`}
                         placeholder="Tempelkan CP pemerintah lengkap di sini. Idealnya memuat Fase, Mata Pelajaran, Elemen, Sub Elemen, dan isi CP..."
                     ></textarea>
 
@@ -116,7 +114,7 @@ const MagicBoxInput = ({ onAnalyze, identity }) => {
                             <button
                                 onClick={handleReset}
                                 disabled={isAnalyzing}
-                                className="flex items-center space-x-2 px-4 py-2.5 rounded-full font-bold text-slate-600 bg-white hover:bg-slate-100 border border-slate-200 shadow-sm transition-all"
+                                className="flex items-center space-x-2 rounded-lg border border-slate-200 bg-white px-4 py-2.5 font-bold text-slate-600 shadow-sm transition-all hover:bg-slate-100"
                                 title="Reset"
                             >
                                 <RotateCcw size={18} />
@@ -126,9 +124,9 @@ const MagicBoxInput = ({ onAnalyze, identity }) => {
                         <button
                             onClick={handleAnalyze}
                             disabled={isAnalyzing || !text.trim()}
-                            className={`flex items-center space-x-2 px-6 py-2.5 rounded-full font-bold text-white shadow-lg transition-all transform hover:scale-105 active:scale-95 ${!text.trim() || isAnalyzing
+                            className={`flex items-center space-x-2 rounded-lg px-6 py-2.5 font-bold text-white shadow-lg transition-all ${!text.trim() || isAnalyzing
                                 ? 'bg-slate-300 cursor-not-allowed'
-                                : 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700'
+                                : 'bg-slate-950 hover:bg-cyan-700'
                                 }`}
                         >
                             {isAnalyzing ? (
@@ -147,8 +145,6 @@ const MagicBoxInput = ({ onAnalyze, identity }) => {
                 </div>
             </div>
 
-            {/* Decorative Glow */}
-            <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500 to-pink-500 opacity-20 blur-xl rounded-2xl z-0 transition-opacity duration-500 group-hover:opacity-40"></div>
         </div>
     );
 };

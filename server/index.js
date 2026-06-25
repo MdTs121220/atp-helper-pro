@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import { generateATP } from './controllers/atp.controller.js';
+import { adminLogin, generateATP, testAIEngine } from './controllers/atp.controller.js';
 
 dotenv.config();
 
@@ -13,6 +13,8 @@ app.use(express.json());
 
 // API Routes
 app.post('/api/atp/generate', generateATP);
+app.post('/api/ai/test', testAIEngine);
+app.post('/api/admin/login', adminLogin);
 
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
