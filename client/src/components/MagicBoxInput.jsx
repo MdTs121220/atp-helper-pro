@@ -4,6 +4,10 @@ import { smartParser } from '../utils/smartParser';
 
 const MagicBoxInput = ({ onAnalyze, identity, aiConfig }) => {
     const [text, setText] = useState('');
+    const [cpMeta, setCpMeta] = useState({
+        elemen: '',
+        subElemen: ''
+    });
     const [isAnalyzing, setIsAnalyzing] = useState(false);
     const [detectedData, setDetectedData] = useState(null);
     const [error, setError] = useState(null);
@@ -26,14 +30,20 @@ const MagicBoxInput = ({ onAnalyze, identity, aiConfig }) => {
 
     const handleReset = () => {
         setText('');
+        setCpMeta({ elemen: '', subElemen: '' });
         setDetectedData(null);
         setError(null);
         setIsAnalyzing(false);
     };
 
     const handleAnalyze = async () => {
+        if (!cpMeta.elemen.trim()) {
+            setError("Elemen CP wajib diisi agar TP/ATP tidak menjadi umum.");
+            return;
+        }
+
         if (!text.trim()) {
-            setError("Silakan tempel teks CP terlebih dahulu!");
+            setError("Silakan tempel isi CP terlebih dahulu!");
             return;
         }
 
@@ -45,7 +55,7 @@ const MagicBoxInput = ({ onAnalyze, identity, aiConfig }) => {
             const response = await fetch('/api/atp/generate', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ text, identity, aiConfig })
+                body: JSON.stringify({ text, identity, cpMeta, aiConfig })
             });
 
             const data = await response.json();
@@ -75,7 +85,7 @@ const MagicBoxInput = ({ onAnalyze, identity, aiConfig }) => {
                         </div>
                         <div>
                             <h3 className="text-lg font-black text-slate-900">AI Penyusun TP & ATP</h3>
-                            <p className="text-xs text-slate-500">Input wajib: fase, mapel, elemen/sub-elemen, dan isi CP.</p>
+                            <p className="text-xs text-slate-500">Isi elemen dan sub-elemen di sini, lalu tempel isi CP saja.</p>
                         </div>
                     </div>
                     {detectedData && (
@@ -94,12 +104,48 @@ const MagicBoxInput = ({ onAnalyze, identity, aiConfig }) => {
                     )}
                 </div>
 
-                <div className="relative">
+                <div className="space-y-4">
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                        <label className="block">
+                            <span className="mb-2 block text-xs font-black uppercase tracking-wide text-slate-500">
+                                Elemen CP <span className="text-red-500">*</span>
+                            </span>
+                            <input
+                                type="text"
+                                value={cpMeta.elemen}
+                                onChange={(event) => {
+                                    setCpMeta(prev => ({ ...prev, elemen: event.target.value }));
+                                    setError(null);
+                                }}
+                                className={`w-full rounded-lg border bg-white px-3 py-3 text-sm font-semibold text-slate-800 outline-none transition focus:border-cyan-500 focus:ring-2 focus:ring-cyan-100 ${error && !cpMeta.elemen.trim() ? 'border-red-300' : 'border-slate-200'}`}
+                                placeholder="Contoh: Pemahaman IPAS"
+                            />
+                        </label>
+
+                        <label className="block">
+                            <span className="mb-2 block text-xs font-black uppercase tracking-wide text-slate-500">
+                                Sub Elemen <span className="font-bold normal-case text-slate-400">(jika ada)</span>
+                            </span>
+                            <input
+                                type="text"
+                                value={cpMeta.subElemen}
+                                onChange={(event) => setCpMeta(prev => ({ ...prev, subElemen: event.target.value }))}
+                                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-3 text-sm font-semibold text-slate-800 outline-none transition focus:border-cyan-500 focus:ring-2 focus:ring-cyan-100"
+                                placeholder="Contoh: Sumber daya alam"
+                            />
+                        </label>
+                    </div>
+
+                    <div className="rounded-lg border border-cyan-100 bg-cyan-50 px-3 py-2 text-xs leading-5 text-cyan-900">
+                        Kotak di bawah cukup isi <strong>teks CP</strong>. Jangan perlu ulangi elemen/sub-elemen jika sudah diisi di atas.
+                    </div>
+
+                    <div className="relative">
                     <textarea
                         value={text}
                         onChange={handleTextChange}
                         className={`h-56 w-full resize-none rounded-lg border bg-slate-50 p-4 text-sm leading-6 text-slate-700 shadow-inner transition-all focus:border-cyan-500 focus:ring-2 focus:ring-cyan-100 ${error ? 'border-red-300 bg-red-50' : 'border-slate-200'}`}
-                        placeholder="Tempelkan CP pemerintah lengkap di sini. Idealnya memuat Fase, Mata Pelajaran, Elemen, Sub Elemen, dan isi CP..."
+                        placeholder="Tempel isi CP di sini. Contoh: Pada akhir fase F, peserta didik mampu memahami keteladanan tokoh-tokoh agama..."
                     ></textarea>
 
                     {error && (
@@ -123,8 +169,8 @@ const MagicBoxInput = ({ onAnalyze, identity, aiConfig }) => {
                         )}
                         <button
                             onClick={handleAnalyze}
-                            disabled={isAnalyzing || !text.trim()}
-                            className={`flex items-center space-x-2 rounded-lg px-6 py-2.5 font-bold text-white shadow-lg transition-all ${!text.trim() || isAnalyzing
+                            disabled={isAnalyzing || !text.trim() || !cpMeta.elemen.trim()}
+                            className={`flex items-center space-x-2 rounded-lg px-6 py-2.5 font-bold text-white shadow-lg transition-all ${!text.trim() || !cpMeta.elemen.trim() || isAnalyzing
                                 ? 'bg-slate-300 cursor-not-allowed'
                                 : 'bg-slate-950 hover:bg-cyan-700'
                                 }`}
@@ -141,6 +187,7 @@ const MagicBoxInput = ({ onAnalyze, identity, aiConfig }) => {
                                 </>
                             )}
                         </button>
+                    </div>
                     </div>
                 </div>
             </div>

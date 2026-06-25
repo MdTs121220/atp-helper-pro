@@ -24,6 +24,27 @@ const detectMetadata = (text, identity = {}) => {
     return { fase, mapel };
 };
 
+const normalizeCpMeta = (cpMeta = {}) => ({
+    elemen: (cpMeta.elemen || cpMeta.element || '').trim(),
+    subElemen: (cpMeta.subElemen || cpMeta.sub_elemen || cpMeta.subElement || '').trim()
+});
+
+const buildStructuredCpText = (text, cpMeta = {}) => {
+    const meta = normalizeCpMeta(cpMeta);
+    const cleanText = (text || '').trim();
+
+    if (!meta.elemen) return cleanText;
+
+    const hasElementInText = /(?:^|\n)\s*(?:Elemen|Element)\s*[:\-]?/i.test(cleanText);
+    if (hasElementInText) return cleanText;
+
+    return [
+        `Elemen: ${meta.elemen}`,
+        meta.subElemen ? `Sub Elemen: ${meta.subElemen}` : '',
+        cleanText
+    ].filter(Boolean).join('\n');
+};
+
 const splitCpBlocks = (text) => {
     const clean = text.replace(/\r\n/g, '\n').replace(/\t/g, ' ').trim();
     const elementRegex = /(?:^|\n)\s*(?:Elemen|Element)\s*[:\-]?\s*([^\n:]+)?/gi;
@@ -297,8 +318,9 @@ const runAiGeneration = async ({ prompt, config }) => {
     return { text: result.text, engine: { provider: 'gemini', model: result.model } };
 };
 
-const buildPrompt = (text, identity = {}) => {
+const buildPrompt = (text, identity = {}, cpMeta = {}) => {
     const metadata = detectMetadata(text, identity);
+    const meta = normalizeCpMeta(cpMeta);
 
     return `
 Anda adalah AI khusus penyusun Tujuan Pembelajaran (TP) dan Alur Tujuan Pembelajaran (ATP) untuk guru Indonesia.
@@ -320,6 +342,8 @@ KONTEKS PPA 2025 YANG WAJIB DIIKUTI:
 DATA IDENTITAS OPSIONAL:
 - Mata pelajaran: ${metadata.mapel || '-'}
 - Fase: ${metadata.fase || '-'}
+- Elemen CP: ${meta.elemen || 'ambil dari input CP'}
+- Sub Elemen: ${meta.subElemen || '-'}
 - Kondisi sarpras: ${identity.kondisi || '-'}
 
 INPUT CP MENTAH:
@@ -327,7 +351,7 @@ INPUT CP MENTAH:
 
 TUGAS:
 1. Ekstrak metadata fase, mapel, jenjang jika ada.
-2. Pecah CP berdasarkan elemen dan sub-elemen yang tersedia.
+2. Gunakan Elemen CP dan Sub Elemen dari input terstruktur sebagai sumber utama. Jika teks CP juga memuat elemen lain, pecah berdasarkan elemen/sub-elemen yang tersedia.
 3. Untuk setiap elemen/sub-elemen, analisis kompetensi inti dan konten inti.
 4. Turunkan TP yang spesifik, tidak repetitif, tidak terlalu luas, dan tetap langsung bersumber dari CP.
 5. Susun TP menjadi ATP yang logis satu fase/tahun. Beri alasan urutan per TP.
@@ -385,19 +409,20 @@ KEMBALIKAN JSON MURNI SAJA, tanpa markdown:
 
 export const generateATP = async (req, res) => {
     try {
-        const { text, identity = {}, aiConfig = null } = req.body;
+        const { text, identity = {}, cpMeta = {}, aiConfig = null } = req.body;
         if (!text || !text.trim()) {
             return res.status(400).json({ error: 'Teks CP tidak boleh kosong.' });
         }
 
+        const structuredText = buildStructuredCpText(text, cpMeta);
         const config = getEngineConfig(aiConfig || {});
-        const prompt = buildPrompt(text, identity);
+        const prompt = buildPrompt(structuredText, identity, cpMeta);
 
         if (config.apiKey) {
             try {
                 const aiResponse = await runAiGeneration({ prompt, config });
                 const parsed = JSON.parse(cleanJsonText(aiResponse.text));
-                const normalized = normalizeResult(parsed, text, identity);
+                const normalized = normalizeResult(parsed, structuredText, identity);
                 return res.json({
                     ...normalized,
                     engine: aiResponse.engine
@@ -408,7 +433,7 @@ export const generateATP = async (req, res) => {
         }
 
         console.log('AI unavailable. Returning CP-based offline draft.');
-        return res.json(buildOfflineDraft(text, identity));
+        return res.json(buildOfflineDraft(structuredText, identity));
     } catch (error) {
         console.error('Fatal Controller Error:', error);
         res.status(500).json({ error: 'Internal Server Error', details: error.message });
