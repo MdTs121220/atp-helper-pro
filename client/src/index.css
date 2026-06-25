@@ -16,7 +16,7 @@ h4,
 h5,
 h6 {
   font-family: 'Plus Jakarta Sans', sans-serif;
-  @apply font-bold text-slate-900;
+  @apply font-bold;
 }
 
 /* Custom Scrollbar - Minimal */
